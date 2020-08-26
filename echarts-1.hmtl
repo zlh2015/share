@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+   </head>
+   <body style="height: 100%; margin: 0">
+       <div id="container" style="height: 100%"></div>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+       <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=xfhhaTThl11qYVrqLZii6w8qE5ggnhrY&__ec_v__=20190126"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+       <script type="text/javascript">
+var dom = document.getElementById("container");
+var myChart = echarts.init(dom);
+var app = {};
+option = null;
+var idata=  [
+    {name:"111",value: [1,20], itemStyle:{color: "blue"}},
+    {name:"222",value: [2,30], itemStyle:{color: "red"}},
+    {name:"333",value: [3,40], itemStyle:{color: "blue"}},
+    {name:"333",value: [4,-40], itemStyle:{color: "blue"}},
+]
+
+
+option = {
+    color: ['#3398DB'],
+
+    grid: [
+         {width: '80%', height: '30%', top:'50%', z:1,backgroundColor:"#ccc"},
+        {width: '80%', height: '38%', backgroundColor:"#ccc"},
+       
+     
+    ],
+    xAxis: [
+        {
+           
+            gridIndex: 0,
+            type:"category",
+            max:39,
+            interval:1,
+            axisLabel: {
+
+                rotate: 90,
+                formatter: function (value, index) {
+                    return "2020-08-26 12:03:23";
+                }
+            },
+            minorTick: {
+                show: true,
+                splitNumber: 2
+            }
+        },       
+        {
+            gridIndex: 1,
+            type: 'value',
+            position:"bottom",
+            min:0,
+            max:40,
+            interval:4,
+
+        },
+        {
+            gridIndex: 0,
+            type: 'value',
+            position:"top",
+            min:0,
+            max:40,
+            interval:1,
+
+        }
+    ],
+    yAxis: [
+        {
+            gridIndex: 0,
+            type: 'value',
+            max: 250,
+            interval: 50,
+            axisLabel: {
+                formatter: function (value, index) {
+                    if(value < 0){
+                        return -1000;
+                    }
+                    if(value > 200){
+                        return 10000;
+                    }else{
+                        return value;
+                    }
+                    
+                }
+            },
+                
+        },
+        {
+            gridIndex: 1,
+            type: 'value',
+            max: 300
+        },
+        {
+            gridIndex: 0,
+            type: 'value',
+            max: 300,
+            min: 200
+        }
+    ],
+    series: [
+        {
+            name: '直接访问',
+            xAxisIndex: 0,
+            yAxisIndex:0,
+            type: 'bar',
+            data: idata
+        },
+
+        {
+            type: 'custom',
+            xAxisIndex: 1,
+            yAxisIndex: 1,
+            renderItem: function (params, api) {
+                var categoryIndex = api.value(0);
+                var start = api.coord([ api.value(0), 0]);
+                var end = api.coord([ api.value(1), 0]);
+                var height = api.size([0, 1])[1] * api.value(2);
+
+                var rectShape = echarts.graphic.clipRectByRect({
+                    x: start[0] + 2,
+                    y: start[1] - height,
+                    width: end[0] - start[0] - 4,
+                    height: height
+                }, {
+                    x: params.coordSys.x,
+                    y: params.coordSys.y,
+                    width: params.coordSys.width,
+                    height: params.coordSys.height
+                });
+
+                return rectShape && {
+                    type: 'rect',
+                    shape: rectShape,
+                    style: api.style()
+                };
+            },
+            data: [ [0,4,40],[4,8,220],[8,12,160]]
+        },
+
+        {
+            type: 'custom',
+            xAxisIndex: 2,
+            yAxisIndex: 0,
+            renderItem: function (params, api) {
+                var categoryIndex = api.value(0);
+                var start = api.coord([ api.value(0), 0]);
+                var end = api.coord([ api.value(1), 0]);
+                var height = api.size([0, 1])[1] * api.value(2);
+
+                var rectShape = echarts.graphic.clipRectByRect({
+                    x: start[0] + 2,
+                    y: start[1] - height,
+                    width: end[0] - start[0] - 4,
+                    height: height
+                }, {
+                    x: params.coordSys.x,
+                    y: params.coordSys.y,
+                    width: params.coordSys.width,
+                    height: params.coordSys.height
+                });
+
+                return rectShape && {
+                    type: 'rect',
+                    shape: rectShape,
+                    style: {"fill":"#4ae69a7a"}
+                };
+            },
+            data:[ [0,4,40],[4,8,220],[8,12,160]]
+        }
+    ]
+};
+
+myChart.on('click', function (params) {
+    console.log(params)
+    if (params.componentType === 'markPoint') {
+        // 点击到了 markPoint 上
+        if (params.seriesIndex === 5) {
+            // 点击到了 index 为 5 的 series 的 markPoint 上。
+        }
+    }
+    else if (params.componentType === 'series') {
+        if (params.seriesType === 'custom') {
+            console.log(params)
+        }
+    }
+});
+
+// setInterval(function () {
+//     console.log(idata);
+//     // idata = [];
+//     var ll = idata.length;
+//     for(var k=1; k <= ll; k++){
+//         idata.shift();
+//     }
+
+//     for(var i=1; i <= 40; i++){
+//         var v =  (Math.random()- 0.4)*500;
+//         if(v < 0){
+//             v = v/10 - 20;
+//             idata.push({name:"333",value: [i,v], itemStyle:{color: "red"}});
+//         }else if(v > 200){
+//             v = 220 + (v - 200)/1000;
+//             idata.push({name:"333",value: [i,v], itemStyle:{color: "red"}});
+//         }else{
+//             idata.push({name:"333",value: [i,v], itemStyle:{color: "blue"}});
+//         }
+        
+        
+//     }
+    
+//     myChart.setOption(option);
+// }, 5000);
+;
+if (option && typeof option === "object") {
+    myChart.setOption(option, true);
+}
+       </script>
+   </body>
+</html>
